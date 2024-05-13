@@ -1,7 +1,7 @@
 {
-  "name": "alx-files_manager",
+  "name": "queuing_system_in_js",
   "version": "1.0.0",
-  "description": "alx-files_manager",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "lint": "./node_modules/.bin/eslint",
@@ -9,21 +9,20 @@
     "start-server": "nodemon --exec babel-node --presets @babel/preset-env ./server.js",
     "start-worker": "nodemon --exec babel-node --presets @babel/preset-env ./worker.js",
     "dev": "nodemon --exec babel-node --presets @babel/preset-env",
-    "test": "mocha --require @babel/register --exit"
+    "test": "./node_modules/.bin/mocha --require @babel/register --exit" 
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bull": "^3.29.3",
-    "chai-http": "^4.4.0",
-    "crypto": "^1.0.1",
-    "express": "^4.19.2",
-    "mime-types": "^2.1.35",
-    "mongodb": "^3.7.4",
+    "bull": "^3.16.0",
+    "chai-http": "^4.3.0",
+    "express": "^4.17.1",
+    "image-thumbnail": "^1.0.10",
+    "mime-types": "^2.1.27",
+    "mongodb": "^3.5.9",
     "redis": "^2.8.0",
-    "redis-promisify": "^0.1.2",
     "sha1": "^1.1.1",
-    "uuid": "^8.3.2"
+    "uuid": "^8.2.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.0",
@@ -32,12 +31,12 @@
     "@babel/preset-env": "^7.8.2",
     "@babel/register": "^7.8.0",
     "chai": "^4.2.0",
+    "mocha": "^6.2.2",
+    "nodemon": "^2.0.2",
     "eslint": "^6.4.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-jest": "^22.17.0",
-    "mocha": "^6.2.2",
-    "nodemon": "^2.0.2",
     "request": "^2.88.0",
     "sinon": "^7.5.0"
   }
