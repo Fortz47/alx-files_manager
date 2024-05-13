@@ -14,7 +14,7 @@ class DBClient {
       await this.client.connect();
       console.log('Connected successfully to server');
       this._db = this.client.db(DB_NAME);
-     })();
+    })();
   }
 
   isAlive() {

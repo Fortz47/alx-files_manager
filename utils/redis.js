@@ -3,26 +3,21 @@
 import { createClient } from 'redis-promisify';
 
 class RedisClient {
-  // _status = false;
-
   constructor() {
-    this._status = false;
     this.client = {};
-    // this.client = createClient()
-    //   .on('error', (err) => {
-    //     console.log('Error connecting to Redis: ' + err);
-    //   })
-    //   .on('connect', () => {
-    //     this._status = true;
-    //   });
+    this.client = createClient()
+      .on('error', (err) => {
+        console.log(`Error connecting to Redis: ${err}`);
+      });
   }
 
   isAlive() {
-    return this._status;
+    return this.client.connected;
   }
 
   async get(key) {
-    return await this.client.getAsync(key);
+    const value = await this.client.getAsync(key);
+    return value;
   }
 
   async set(key, value, duration) {

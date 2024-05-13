@@ -11,33 +11,41 @@
 //     }, 1000*10)
 // })();
 
-import dbClient from './utils/db';
+// import dbClient from './utils/db';
 
-const waitConnection = () => {
-    return new Promise((resolve, reject) => {
-        let i = 0;
-        const repeatFct = async () => {
-            await setTimeout(() => {
-                i += 1;
-                if (i >= 10) {
-                    reject()
-                }
-                else if(!dbClient.isAlive()) {
-                    repeatFct()
-                }
-                else {
-                    resolve()
-                }
-            }, 1000);
-        };
-        repeatFct();
-    })
-};
+// const waitConnection = () => {
+//     return new Promise((resolve, reject) => {
+//         let i = 0;
+//         const repeatFct = async () => {
+//             await setTimeout(() => {
+//                 i += 1;
+//                 if (i >= 10) {
+//                     reject()
+//                 }
+//                 else if(!dbClient.isAlive()) {
+//                     repeatFct()
+//                 }
+//                 else {
+//                     resolve()
+//                 }
+//             }, 1000);
+//         };
+//         repeatFct();
+//     })
+// };
 
-(async () => {
-    console.log(dbClient.isAlive());
-    await waitConnection();
-    console.log(dbClient.isAlive());
-    console.log(await dbClient.nbUsers());
-    console.log(await dbClient.nbFiles());
-})();
+// (async () => {
+//     console.log(dbClient.isAlive());
+//     await waitConnection();
+//     console.log(dbClient.isAlive());
+//     console.log(await dbClient.nbUsers());
+//     console.log(await dbClient.nbFiles());
+// })();
+
+//const uuidv4 = require('uuid').v4;
+import {v4} from 'uuid';
+
+const decodedString = Buffer.from('Ym9iQGR5bGFuLmNvbTp0b3RvMTIzNCE=', 'base64').toString('utf-8');
+console.log(decodedString);
+console.log("Basic Ym9iQGR5bGFuLmNvbTp0b3RvMTIzNCE=".startsWith('Basic'));
+console.log(v4());
