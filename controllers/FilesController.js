@@ -3,7 +3,8 @@ import { v4 as uuidv4 } from 'uuid';
 import dbClient from '../utils/db';
 import { userAuth, decodeString } from '../utils/utility';
 
-const { writeFile, mkdir } = require('fs').promises;
+const { writeFile, mkdir, readFile } = require('fs').promises;
+const mime = require('mime-types');
 
 class FilesController {
   static async postUpload(req, res) {
@@ -169,6 +170,49 @@ class FilesController {
     if (modifiedFile.localPath) delete modifiedFile.localPath;
 
     res.send(modifiedFile);
+  }
+
+  static async getFile(req, res) {
+    const user = await userAuth.authUser(req);
+    const { id } = req.params;
+    const objectId = new ObjectId(id);
+    const file = await dbClient.getDocumentInCollectionByProperty('files', { _id: objectId });
+    if (!file) {
+      res.status(404).send({ error: 'Not found' });
+      return;
+    }
+    console.log(file.isPublic === false);
+    if (file.isPublic === false && !user) {
+      res.status(404).send({ error: 'Not found' });
+      return;
+    }
+    if (file.userId !== user.id) {
+      res.status(404).send({ error: 'Not found' });
+      return;
+    }
+    if (file.type === 'folder') {
+      res.status(400).send({ error: 'A folder doesn\'t have content' });
+      return;
+    }
+
+    let isAccesible = true;
+    let encodedData = '';
+    try {
+      encodedData = await readFile(file.localPath, { encoding: 'base64' });
+    } catch (error) {
+      isAccesible = false;
+      console.log(`"${file.localPath}" not accesible: ${error}`);
+    }
+    if (isAccesible === false) {
+      res.status(404).send({ error: 'Not found' });
+      return;
+    }
+
+    let mimeType = mime.lookup(file.name);
+    mimeType = mimeType || 'application/octet-stream'
+    res.setHeader('Content-type', mimeType);
+    const decodedData = decodeString(encodedData, 'base64', 'utf-8');
+    res.status(200).send(decodedData);
   }
 }
 

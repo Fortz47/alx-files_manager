@@ -7,7 +7,7 @@ const url = `mongodb://${DB_HOST}:${DB_PORT}`;
 
 class DBClient {
   constructor() {
-    this.client = new MongoClient(url);
+    this.client = new MongoClient(url, { useUnifiedTopology: true }); // { useUnifiedTopology: true } Sets Server Discovery and Monitoring engine to latest/new
     (async () => {
       await this.client.connect();
       this._db = this.client.db(DB_NAME);
