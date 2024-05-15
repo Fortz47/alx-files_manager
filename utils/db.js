@@ -1,5 +1,3 @@
-#!/usr/bin/node
-
 import { MongoClient } from 'mongodb';
 
 const DB_HOST = process.env.DB_HOST || '127.0.0.1';

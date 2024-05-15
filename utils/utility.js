@@ -1,5 +1,3 @@
-#!/usr/bin/node
-
 import { ObjectId } from 'mongodb';
 import redisClient from './redis';
 import dbClient from './db';

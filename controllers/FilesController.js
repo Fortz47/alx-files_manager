@@ -1,5 +1,3 @@
-#!/usr/bin/node
-
 import { ObjectId } from 'mongodb';
 import { writeFile, mkdir } from 'fs/promises';
 import { v4 as uuidv4 } from 'uuid';

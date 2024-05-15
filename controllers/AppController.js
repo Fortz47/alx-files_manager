@@ -15,7 +15,7 @@ class AppConroller {
     const nbUsers = await dbClient.nbUsers();
     const nbFiles = await dbClient.nbFiles();
     const stat = { users: nbUsers, files: nbFiles };
-    res.status(200).json(stat).end();
+    res.send(stat);
   }
 }
 

@@ -1,5 +1,3 @@
-#!/usr/bin/node
-
 import crypto from 'crypto';
 import dbClient from '../utils/db';
 import { userAuth } from '../utils/utility';

@@ -1,5 +1,3 @@
-#!/usr/bin/node
-
 import express from 'express';
 import loadRoutes from './routes';
 
