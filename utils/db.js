@@ -21,11 +21,13 @@ class DBClient {
   }
 
   async nbUsers() {
-    return this._db.collection('users').countDocuments();
+    const count = await this._db.collection('users').countDocuments();
+    return count;
   }
 
   async nbFiles() {
-    return this._db.collection('files').countDocuments();
+    const count = await this._db.collection('files').countDocuments();
+    return count;
   }
 
   async insertDocument(collection, document) {

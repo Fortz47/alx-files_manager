@@ -9,8 +9,8 @@ class AppConroller {
     res.json(status);
   }
 
-  static getStat(req, res) {
-    const stat = { users: dbClient.nbUsers(), files: dbClient.nbFiles() };
+  static async getStat(req, res) {
+    const stat = { users: await dbClient.nbUsers(), files: await dbClient.nbFiles() };
     res.json(stat);
   }
 }
