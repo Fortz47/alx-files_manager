@@ -123,6 +123,52 @@ class FilesController {
     });
     res.status(200).send(modifiedDocs);
   }
+
+  static async putPublish(req, res) {
+    const user = await userAuth.authUser(req);
+    if (!user) {
+      res.status(401).send({ error: 'Unauthorized' });
+      return;
+    }
+
+    const { id } = req.params;
+    const objectId = new ObjectId(id);
+    const file = await dbClient.getDocumentInCollectionByProperty('files', { _id: objectId, userId: user.id });
+    if (!file) {
+      res.status(404).send({ error: 'Not found' });
+      return;
+    }
+
+    const modifiedFile = { id, ...file };
+    modifiedFile.isPublic = true;
+    delete modifiedFile._id;
+    if (modifiedFile.localPath) delete modifiedFile.localPath;
+
+    res.send(modifiedFile);
+  }
+
+  static async putUnpublish(req, res) {
+    const user = await userAuth.authUser(req);
+    if (!user) {
+      res.status(401).send({ error: 'Unauthorized' });
+      return;
+    }
+
+    const { id } = req.params;
+    const objectId = new ObjectId(id);
+    const file = await dbClient.getDocumentInCollectionByProperty('files', { _id: objectId, userId: user.id });
+    if (!file) {
+      res.status(404).send({ error: 'Not found' });
+      return;
+    }
+
+    const modifiedFile = { id, ...file };
+    modifiedFile.isPublic = false;
+    delete modifiedFile._id;
+    if (modifiedFile.localPath) delete modifiedFile.localPath;
+
+    res.send(modifiedFile);
+  }
 }
 
 export default FilesController;

@@ -3,12 +3,12 @@ console.log(res);
 const username = 'bob@dylan.com';
 const password = 'toto1234!';
 const base64Encoding = 'Ym9iQGR5bGFuLmNvbTp0b3RvMTIzNCE=';
-const token = '2f95a6d2-a03a-4e21-9c67-58660114610e';
+const token = '9db96393-4018-4c79-96c3-b1a7272d8a7f';
 
-import { writeFile } from 'fs/promises';
+// import { writeFile } from 'fs/promises';
 //const {writeFile} = require('fs').promises;
 
-(async () => {
-	const res = await writeFile('/tmp/hello.txt', 'hello world!!');
-	console.log(`Finshed: ${res}`);
-})();
+// (async () => {
+// 	const res = await writeFile('/tmp/hello.txt', 'hello world!!');
+// 	console.log(`Finshed: ${res}`);
+// })();
