@@ -1,14 +1,11 @@
-#!/usr/bin/node
-
 import redisClient from '../utils/redis';
 import dbClient from '../utils/db';
 
-class AppConroller {
+class AppController {
   static getStatus(req, res) {
     const redisStatus = redisClient.isAlive();
     const dbStatus = dbClient.isAlive();
-    const status = { redis: redisStatus, db: dbStatus };
-    res.status(200).json(status).end();
+    res.send({ redis: redisStatus, db: dbStatus });
   }
 
   static async getStat(req, res) {
@@ -19,4 +16,4 @@ class AppConroller {
   }
 }
 
-export default AppConroller;
+export default AppController;
