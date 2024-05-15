@@ -12,7 +12,6 @@ class DBClient {
     this.client = new MongoClient(url);
     (async () => {
       await this.client.connect();
-      console.log('Connected successfully to server');
       this._db = this.client.db(DB_NAME);
     })();
   }
@@ -38,6 +37,11 @@ class DBClient {
     // property is an object with a single key-value, ex: {email: john@gmail.com}
     const document = await this._db.collection(collection).findOne(property);
     return document;
+  }
+
+  async getCollection(collectionName) {
+    const collection = await this._db.collection(collectionName);
+    return collection;
   }
 }
 

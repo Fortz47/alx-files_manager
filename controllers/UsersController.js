@@ -2,7 +2,7 @@
 
 import crypto from 'crypto';
 import dbClient from '../utils/db';
-import redisClient from '../utils/redis';
+import { userAuth } from '../utils/utility';
 
 class UsersController {
   static async postNew(req, res) {
@@ -30,15 +30,12 @@ class UsersController {
   }
 
   static async getMe(req, res) {
-    const token = req.header('X-Token');
-    const userId = await redisClient.get(`auth_${token}`);
-    const user = await dbClient.getDocumentInCollectionByProperty('users', { _id: userId });
+    const user = await userAuth.authUser(req, res);
     if (!user) {
       res.status(401).send({ error: 'Unauthorized' });
-      return null;
+      return;
     }
-    res.status(200).json({ id: user._id, email: user.email });
-    return { id: user._id, email: user.email };
+    res.status(200).json(user);
   }
 }
 

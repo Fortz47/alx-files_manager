@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
+import { userAuth } from '../utils/utility';
 
 class AuthController {
   static async getConnect(req, res) {
@@ -28,17 +29,22 @@ class AuthController {
       return false;
     }
     const token = uuidv4();
-    redisClient.set(`auth_${token}`, user._id, 86400);
+    try {
+      await redisClient.set(`auth_${token}`, user._id.toString(), 86400);
+    } catch (err) {
+      console.log(`Failed to save auth_token in Redis: ${err}`);
+    }
     res.status(200).send({ token });
     return true;
   }
 
   static async getDisconnect(req, res) {
-    const token = req.header('X-Token');
-    if (!token) {
+    const user = userAuth.authUser(req, res);
+    if (!user) {
       res.status(401).send({ error: 'Unauthorized' });
       return false;
     }
+    const token = req.header('X-Token');
     await redisClient.del(`auth_${token}`);
     res.status(204).end();
     return true;

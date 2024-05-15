@@ -1,19 +1,18 @@
 #!/usr/bin/node
 
+import { ObjectId } from 'mongodb';
+import { writeFile, mkdir } from 'fs/promises';
 import { v4 as uuidv4 } from 'uuid';
-import AuthController from './AuthController';
-import UsersController from './UsersController';
 import dbClient from '../utils/db';
+import { userAuth, decodeString } from '../utils/utility';
 
 class FilesController {
   static async postUpload(req, res) {
-    const isConnected = await AuthController.getConnect(req, res);
-    if (isConnected === false) {
+    const user = await userAuth.authUser(req);
+    if (!user) {
       res.status(401).send({ error: 'Unauthorized' });
       return;
     }
-
-    const user = await UsersController.getMe(req, res);
 
     const { body } = req;
     if (!body.name) {
@@ -29,11 +28,10 @@ class FilesController {
       return;
     }
 
-    // check if parentId is set in body.
-    // Number() is used for case where parentId was set to zero
-    // we want 0 to mark as true and not false
-    if (Number(body.parentId)) {
-      const file = await dbClient.getDocumentInCollectionByProperty('files', { parentId: body.parentId });
+    // check if parentId is set in body
+    if (body.parentId) {
+      const toObjectId = new ObjectId(body.parentId);
+      const file = await dbClient.getDocumentInCollectionByProperty('files', { _id: toObjectId });
       if (!file) {
         res.status(400).send({ error: 'Parent not found' });
         return;
@@ -49,7 +47,7 @@ class FilesController {
     body.userId = user.id;
     if (body.type === 'folder') {
       await dbClient.insertDocument('files', body);
-      res.status(201).send(body);
+      res.status(201).json(body);
       return;
     }
 
@@ -63,8 +61,69 @@ class FilesController {
       parentId: body.parentId,
       localPath: `${filePath}/${fileName}`,
     };
-    await dbClient.insertDocument('files', file);
-    res.status(201).send(file);
+    const result = await dbClient.insertDocument('files', file);
+    const doc = result.ops[0];
+    // create file and write to file
+    const data = decodeString(body.data, 'base64', 'utf-8');
+    try {
+      await mkdir(filePath, { recursive: true });
+      await writeFile(file.localPath, data);
+    } catch (err) {
+      console.log(`Error creating/writing file: ${err}`);
+    }
+
+    res.status(201).json({
+      id: result.insertedId,
+      userId: doc.userId,
+      name: doc.name,
+      type: doc.type,
+      isPublic: doc.isPublic,
+      parentId: doc.parentId,
+    });
+  }
+
+  static async getShow(req, res) {
+    const user = await userAuth.authUser(req);
+    if (!user) {
+      res.status(401).send({ error: 'Unauthorized' });
+      return;
+    }
+
+    const id = new ObjectId(req.params.id);
+    const file = await dbClient.getDocumentInCollectionByProperty('files', { _id: id, userId: user.id });
+    if (!file) {
+      res.status(404).send({ error: 'Not found' });
+      return;
+    }
+
+    const modifiedFile = { id: file._id.toString(), ...file };
+    delete modifiedFile._id;
+    if (modifiedFile.localPath) delete modifiedFile.localPath;
+    res.status(200).send(modifiedFile);
+  }
+
+  static async getIndex(req, res) {
+    const user = await userAuth.authUser(req);
+    if (!user) {
+      res.status(401).send({ error: 'Unauthorized' });
+      return;
+    }
+
+    let { parentId, page } = req.query;
+    page = page || 0;
+    parentId = parentId || 0;
+    const limit = 20;
+    const offset = page * limit;
+    const filesCollection = await dbClient.getCollection('files');
+    const docs = await filesCollection.find({ parentId }).skip(offset).limit(limit).toArray();
+
+    const modifiedDocs = docs.map((doc) => {
+      const newObj = { id: doc._id.toString(), ...doc };
+      delete newObj._id;
+      if (newObj.localPath) delete newObj.localPath;
+      return newObj;
+    });
+    res.status(200).send(modifiedDocs);
   }
 }
 
