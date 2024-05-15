@@ -10,7 +10,7 @@ app.use(express.json());
 loadRoutes(app);
 
 app.listen(PORT, () => {
-  console.log(`Server running on port localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
 
 export default app;
