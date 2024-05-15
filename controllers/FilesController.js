@@ -1,8 +1,9 @@
 import { ObjectId } from 'mongodb';
-import { writeFile, mkdir } from 'fs/promises';
 import { v4 as uuidv4 } from 'uuid';
 import dbClient from '../utils/db';
 import { userAuth, decodeString } from '../utils/utility';
+
+const { writeFile, mkdir } = require('fs').promises;
 
 class FilesController {
   static async postUpload(req, res) {
