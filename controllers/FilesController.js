@@ -209,7 +209,7 @@ class FilesController {
     }
 
     let mimeType = mime.lookup(file.name);
-    mimeType = mimeType || 'application/octet-stream'
+    mimeType = mimeType || 'application/octet-stream';
     res.setHeader('Content-type', mimeType);
     const decodedData = decodeString(encodedData, 'base64', 'utf-8');
     res.status(200).send(decodedData);
