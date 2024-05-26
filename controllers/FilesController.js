@@ -1,4 +1,6 @@
 import { ObjectId } from 'mongodb';
+// import Queue from 'bull/lib/queue';
+import Queue from 'bull';
 import { v4 as uuidv4 } from 'uuid';
 import dbClient from '../utils/db';
 import { userAuth, decodeString } from '../utils/utility';
@@ -72,14 +74,19 @@ class FilesController {
       console.log(`Error creating/writing file: ${err}`);
     }
 
-    res.status(201).json({
+    const response = {
       id: result.insertedId,
       userId: doc.userId,
       name: doc.name,
       type: doc.type,
       isPublic: doc.isPublic,
       parentId: doc.parentId,
-    });
+    };
+
+    const fileQueue = new Queue('image transcoding');
+    await fileQueue.add({userId: response.userId, fileId: response.id});
+
+    res.status(201).json(response);
   }
 
   static async getShow(req, res) {
@@ -175,8 +182,18 @@ class FilesController {
   static async getFile(req, res) {
     const user = await userAuth.authUser(req);
     const { id } = req.params;
+    const { size } = req.query;
     const objectId = new ObjectId(id);
     const file = await dbClient.getDocumentInCollectionByProperty('files', { _id: objectId });
+    const filePath = `${file.localPath}_${size}`;
+    try {
+      const data = await readFile(filePath);
+      res.send(data);
+      return;
+    } catch (err) {
+      res.status(404).send({ error: 'Not found' });
+      return;
+    }
     if (!file) {
       res.status(404).send({ error: 'Not found' });
       return;
